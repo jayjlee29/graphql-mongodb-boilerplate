@@ -8,7 +8,6 @@ export default () => {
     const connect = () => {
         console.log('connect mongoose', process.env.MONGO_URI)
         const URI = process.env.MONGO_URI || "localhost"; // your mongodb uri
-        //const URI = 'mongodb+srv://tenwelluser:tenwell1122@freecluster.1ghcn.mongodb.net/graphql?retryWrites=true&w=majority'
         const DB = process.env.MONGO_DB || "mongoose"; // your db
     
         const db = mongoose.connection;
