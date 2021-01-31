@@ -1,17 +1,8 @@
 'use strict'
 import mongoose from 'mongoose';
+import { User } from '../../models'
 
-interface User extends mongoose.Document {
-    userId: String;
-    username: String
-    email: String;
-    mobileNumber: String;
-    password: String;
-    created: Date;
-    updated: Date;
-    deleted: Date;
-}
-
+interface IUserSchema extends User, mongoose.Document {}
 const schema = new mongoose.Schema({
     userId: String,
     username: String,
@@ -23,4 +14,4 @@ const schema = new mongoose.Schema({
     deleted: Date
 });
 
-export default mongoose.model<User>('User', schema);
+export default mongoose.model<IUserSchema>('User', schema);

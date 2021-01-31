@@ -1,12 +1,12 @@
 'use strict'
 import { composeMongoose } from 'graphql-compose-mongoose';
 import { schemaComposer } from 'graphql-compose';
-import {User, Channel, Connection, ChannelMessage} from '../mongoose/models'
+import {UserSchema, ChannelSchema, ConnectionSchema, ChannelMessageSchema} from '../mongoose/schema'
 
-const UserTC = composeMongoose(User, {});
-const ChannelTC = composeMongoose(Channel, {});
-const ChannelMessageTC = composeMongoose(ChannelMessage, {});
-const ConnectionTC = composeMongoose(Connection, {});
+const UserTC = composeMongoose(UserSchema, {});
+const ChannelTC = composeMongoose(ChannelSchema, {});
+const ChannelMessageTC = composeMongoose(ChannelMessageSchema, {});
+const ConnectionTC = composeMongoose(ConnectionSchema, {});
 
 //User
 schemaComposer.Query.addNestedFields({
@@ -33,14 +33,54 @@ schemaComposer.Query.addNestedFields({
 });
   
 schemaComposer.Mutation.addNestedFields({
-    "User.createOne": UserTC.mongooseResolvers.createOne(),
-    "User.createMany": UserTC.mongooseResolvers.createMany(),
-    "User.updateById": UserTC.mongooseResolvers.updateById(),
-    "User.updateOne": UserTC.mongooseResolvers.updateOne(),
-    "User.updateMany": UserTC.mongooseResolvers.updateMany(),
-    "User.removeById": UserTC.mongooseResolvers.removeById(),
-    "User.removeOne": UserTC.mongooseResolvers.removeOne(),
-    "User.removeMany": UserTC.mongooseResolvers.removeMany()
+    "User.createOne": UserTC.mongooseResolvers.createOne().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "User.createMany": UserTC.mongooseResolvers.createMany().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "User.updateById": UserTC.mongooseResolvers.updateById().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "User.updateOne": UserTC.mongooseResolvers.updateOne().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "User.updateMany": UserTC.mongooseResolvers.updateMany().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "User.removeById": UserTC.mongooseResolvers.removeById().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "User.removeOne": UserTC.mongooseResolvers.removeOne().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "User.removeMany": UserTC.mongooseResolvers.removeMany().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    })
 });
 // end User
 
@@ -69,14 +109,54 @@ schemaComposer.Query.addNestedFields({
 });
   
 schemaComposer.Mutation.addNestedFields({
-    "Connection.createOne": ConnectionTC.mongooseResolvers.createOne(),
-    "Connection.createMany": ConnectionTC.mongooseResolvers.createMany(),
-    "Connection.updateById": ConnectionTC.mongooseResolvers.updateById(),
-    "Connection.updateOne": ConnectionTC.mongooseResolvers.updateOne(),
-    "Connection.updateMany": ConnectionTC.mongooseResolvers.updateMany(),
-    "Connection.removeById": ConnectionTC.mongooseResolvers.removeById(),
-    "Connection.removeOne": ConnectionTC.mongooseResolvers.removeOne(),
-    "Connection.removeMany": ConnectionTC.mongooseResolvers.removeMany()
+    "Connection.createOne": ConnectionTC.mongooseResolvers.createOne().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "Connection.createMany": ConnectionTC.mongooseResolvers.createMany().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "Connection.updateById": ConnectionTC.mongooseResolvers.updateById().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "Connection.updateOne": ConnectionTC.mongooseResolvers.updateOne().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "Connection.updateMany": ConnectionTC.mongooseResolvers.updateMany().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "Connection.removeById": ConnectionTC.mongooseResolvers.removeById().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "Connection.removeOne": ConnectionTC.mongooseResolvers.removeOne().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "Connection.removeMany": ConnectionTC.mongooseResolvers.removeMany().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    })
 });
 // end Connection
 
@@ -105,14 +185,54 @@ schemaComposer.Query.addNestedFields({
 });
   
 schemaComposer.Mutation.addNestedFields({
-    "Channel.createOne": ChannelTC.mongooseResolvers.createOne(),
-    "Channel.createMany": ChannelTC.mongooseResolvers.createMany(),
-    "Channel.updateById": ChannelTC.mongooseResolvers.updateById(),
-    "Channel.updateOne": ChannelTC.mongooseResolvers.updateOne(),
-    "Channel.updateMany": ChannelTC.mongooseResolvers.updateMany(),
-    "Channel.removeById": ChannelTC.mongooseResolvers.removeById(),
-    "Channel.removeOne": ChannelTC.mongooseResolvers.removeOne(),
-    "Channel.removeMany": ChannelTC.mongooseResolvers.removeMany()
+    "Channel.createOne": ChannelTC.mongooseResolvers.createOne().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "Channel.createMany": ChannelTC.mongooseResolvers.createMany().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "Channel.updateById": ChannelTC.mongooseResolvers.updateById().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "Channel.updateOne": ChannelTC.mongooseResolvers.updateOne().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "Channel.updateMany": ChannelTC.mongooseResolvers.updateMany().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "Channel.removeById": ChannelTC.mongooseResolvers.removeById().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "Channel.removeOne": ChannelTC.mongooseResolvers.removeOne().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "Channel.removeMany": ChannelTC.mongooseResolvers.removeMany().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    })
 });
 // end Channel
 
@@ -141,16 +261,62 @@ schemaComposer.Query.addNestedFields({
 });
   
 schemaComposer.Mutation.addNestedFields({
-    "ChannelMessage.createOne": ChannelMessageTC.mongooseResolvers.createOne(),
-    "ChannelMessage.createMany": ChannelMessageTC.mongooseResolvers.createMany(),
-    "ChannelMessage.updateById": ChannelMessageTC.mongooseResolvers.updateById(),
-    "ChannelMessage.updateOne": ChannelMessageTC.mongooseResolvers.updateOne(),
-    "ChannelMessage.updateMany": ChannelMessageTC.mongooseResolvers.updateMany(),
-    "ChannelMessage.removeById": ChannelMessageTC.mongooseResolvers.removeById(),
-    "ChannelMessage.removeOne": ChannelMessageTC.mongooseResolvers.removeOne(),
-    "ChannelMessage.removeMany": ChannelMessageTC.mongooseResolvers.removeMany()
+    "ChannelMessage.createOne": ChannelMessageTC.mongooseResolvers.createOne().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "ChannelMessage.createMany": ChannelMessageTC.mongooseResolvers.createMany().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "ChannelMessage.updateById": ChannelMessageTC.mongooseResolvers.updateById().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "ChannelMessage.updateOne": ChannelMessageTC.mongooseResolvers.updateOne().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "ChannelMessage.updateMany": ChannelMessageTC.mongooseResolvers.updateMany().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "ChannelMessage.removeById": ChannelMessageTC.mongooseResolvers.removeById().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "ChannelMessage.removeOne": ChannelMessageTC.mongooseResolvers.removeOne().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    }),
+    "ChannelMessage.removeMany": ChannelMessageTC.mongooseResolvers.removeMany().wrapResolve(next=>rp=>{
+        if(rp.context.claims){
+            rp.args = wrappingClaim(rp.args, rp.context.claims)
+        }
+        return next(rp);
+    })
 });
 // end Channel Message
+
+const wrappingClaim = (args: {record: any}, claims: {id: string}) => {
+
+    return Object.assign(args, {record: {userId: claims.id}})
+
+}
 
 const graphqlSchema = schemaComposer.buildSchema();
 export default graphqlSchema;

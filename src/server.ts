@@ -1,3 +1,6 @@
+'use strict'
+import os from 'os'
+
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import bodyParser from 'body-parser'
@@ -10,7 +13,7 @@ import { execute, subscribe } from 'graphql';
 import compression from 'compression';
 import cors from 'cors';
 import connect from './mongoose/connect'
-import authorizer from './authorizer'
+import {verifyAccessToken, generateAccessToken} from './authorizer'
 
 import schema from './graphql/schema';
 import { PubSub } from 'graphql-subscriptions';
@@ -40,25 +43,57 @@ const apolloServer = new ApolloServer({
     },
   },
   context: ({ req, connection }) => {
-    //console.log('oncontext', JSON.stringify(connection))
-    if(connection){
-      return Object.assign({pubsub}, connection.context);
-    } else {
-      const token = req.headers.authorization || '';
-      let claims = null;
-      if(token){
-        const decodedAuthorization = authorizer(token);
+    
+    return new Promise((resolve, reject)=>{
+      try{
+        
+        if(connection){        
+          return resolve(Object.assign({pubsub}, connection.context));
+        } else {
+          const token = req.headers.authorization || '';
+        
+          if(token){
+            return verifyAccessToken(token).then((decoded)=>{
+              console.log('claims', JSON.stringify(decoded))
+              return resolve({claims: decoded, pubsub})
+            }).catch((err)=>{
+              reject(err)
+            });
+
+          }
+        }
+      } catch(e){
+        console.error(e)
       }
-      return {claims, pubsub};  
-    }
+      
+      return resolve({pubsub})
+    })
+  },
+  formatError: (err) => {
+    console.error(err)
+    return err;
   }
 });
 
 
 // restapi
-expressServer.get('/', (req, res)=>{
-  res.send('hello !!')
+/**
+ * generate accessToken for test(24h expired)
+ */
+expressServer.get('/accessToken/test', (req, res)=>{
+  
+  const userId: string = req.params.userId || '';
+  const accessToken = generateAccessToken(userId, 60*60*24)
+  const expiredAt = Date.now() + (60*60*2 * 1000)
+  const body = {
+    accessToken,
+    expiredAt
+  }
+  res.json(body)
+  
+  
 })
+
 expressServer.use('/graphql', bodyParser.json());
 // graphql
 apolloServer.applyMiddleware({ app: expressServer });
@@ -69,23 +104,10 @@ const httpServer = createServer(expressServer);
 apolloServer.installSubscriptionHandlers(httpServer);
 
 httpServer.listen({port}, ()=>{
-  console.log('start server ' + port)
-  console.log('start server subscriptionsPath ' + apolloServer.subscriptionsPath);
+  console.log(`start graphql server http://localhost:${port}/graphql, subscription endpoint : ${apolloServer.subscriptionsPath}`)
+
+  const hostname = os.hostname();
+  const tokenInfo =  JSON.stringify({userId: hostname, accessToken: generateAccessToken(hostname, 60*60*24)})
+  console.log('tokenInfo', tokenInfo)
 })
-/*
-httpServer.listen(
-  {port},
-  () => {
-    new SubscriptionServer({
-      execute,
-      subscribe,
-      schema: schema
-    }, {
-      server: httpServer,
-      path: '/subscriptions',
-    });
-  }
-  
-);
-*/
 

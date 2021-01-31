@@ -1,24 +1,21 @@
 'use strict'
 import { IResolvers } from 'graphql-tools';
-import {User, Channel, ChannelMessage} from '../mongoose/models'
+import {UserSchema, ChannelSchema, ChannelMessageSchema} from '../mongoose/schema'
+import ChannelServiceImpl from '../service/ChannelServiceImpl'
+const channelService = new ChannelServiceImpl();
 
 const resolverMap: IResolvers = {
   Query: {
-    getChannels(root: any, args: any, context: any, info: any) {
+    getChannels(root: any, args: {limit: number, skip: number}, context: any, info: any) {
       const {pubsub} = context
-      const { limit } = args
-
-      const skip = 0;
-      
-      return Channel.find({}, null, {limit, skip})
+      const { limit, skip } = args     
+      return channelService.getChannels({limit, skip: 0});
     },
     getChannelMessages(root: any, args: any, context: any, info: any) {
       const {pubsub} = context
       const { channelId, limit } = args
-
       const skip = 0;
-      
-      return ChannelMessage.find({channelId}, null, {limit, skip})
+      return ChannelMessageSchema.find({channelId}, null, {limit, skip})
     },
   },
   Mutation: {
@@ -38,9 +35,9 @@ const resolverMap: IResolvers = {
       const messageBody = Object.assign(payload, {channelId, sent: Date.now()})
       //channelId 유효성 검사
 
-      return Channel.findById(channelId).then((channel: any)=>{
+      return ChannelSchema.findById(channelId).then((channel: any)=>{
         console.log('findById', channel)
-        const cm = new ChannelMessage()
+        const cm = new ChannelMessageSchema()
 
         return cm.save(messageBody)
           .then((channelMessage: any)=>{
