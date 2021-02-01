@@ -12,17 +12,18 @@ type Mutation {
 }
 
 type Subscription {
-  channel(channelId: String!): SubscriptionMessage
-}
-
-type SubscriptionMessage {
-  channelId: String,
-  payload: String,
-  created: Date
+  channel(channelId: String!): ChannelMessage
 }
 
 type Channel {
-  channelId: String
+  id: String
 }
-type ChannelMessage
-
+type ChannelMessage {
+  id: String
+}
+type User {
+  id: String
+}
+type Connection {
+  id: String
+}
