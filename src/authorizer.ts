@@ -1,6 +1,6 @@
 'use strict'
 import * as jwt from 'jsonwebtoken';
-
+import {IAuthInfo} from './models'
 const SECRET: string = process.env.SECRET || ''
 const ISSUER: string = 'tenwell.com'
 const verifyAccessToken = async (authorization: string) => {
@@ -10,12 +10,17 @@ const verifyAccessToken = async (authorization: string) => {
         const secret = process.env.SECRET + '';
         return new Promise((resolve, reject)=>{
 
-            jwt.verify(token, secret, (err, decoded) => {
+            jwt.verify(token, secret, (err: any, decoded: any) => {
                 if (err) {
                     console.error(err);
                     reject(new Error('Auth Error from authChecker'));
                 } else {
-                    resolve(decoded)
+                    const authInfo : IAuthInfo = {
+                        id: decoded.id,
+                        name: '',
+                        connected: new Date()
+                    }
+                    resolve(authInfo)
                 }
             });
 

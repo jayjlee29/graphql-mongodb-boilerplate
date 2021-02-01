@@ -1,6 +1,6 @@
 'use strict'
 import mongoose from 'mongoose';
-import { ChannelMessage } from '../../models'
+import { IChannelMessage } from '../../models'
 
 //interface IChannelMessageSchema extends ChannelMessage, mongoose.Document {}
 
@@ -15,4 +15,4 @@ const schema = new mongoose.Schema({
     deleted: Date
 });
 
-export default mongoose.model<ChannelMessage & mongoose.Document>('ChannelMessage', schema, 'ChannelMessage');
+export default mongoose.model<IChannelMessage & mongoose.Document>('ChannelMessage', schema, 'ChannelMessage');

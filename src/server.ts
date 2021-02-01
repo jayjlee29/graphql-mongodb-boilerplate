@@ -8,15 +8,14 @@ import depthLimit from 'graphql-depth-limit';
 import { createServer } from 'http';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { execute, subscribe } from 'graphql';
-//import { PubSub } from 'graphql-subscriptions';
+import { PubSub } from 'graphql-subscriptions';
 
 import compression from 'compression';
 import cors from 'cors';
 import connect from './mongoose/connect'
 import {verifyAccessToken, generateAccessToken} from './authorizer'
-
 import schema from './graphql/schema';
-import { PubSub } from 'graphql-subscriptions';
+import {IAuthInfo} from './models'
 
 //monodb connect
 connect();
@@ -53,8 +52,8 @@ const apolloServer = new ApolloServer({
           const token = req.headers.authorization || '';
         
           if(token){
-            return verifyAccessToken(token).then((decoded)=>{ 
-              return resolve({claims: decoded, pubsub})
+            return verifyAccessToken(token).then((authInfo) => { 
+              return resolve({authInfo, pubsub})
             }).catch((err)=>{
               reject(err)
             });

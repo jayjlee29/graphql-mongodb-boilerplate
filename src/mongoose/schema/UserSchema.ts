@@ -1,6 +1,6 @@
 'use strict'
 import mongoose from 'mongoose';
-import { User } from '../../models'
+import { IUser } from '../../models'
 
 const schema = new mongoose.Schema({
     username: String,
@@ -12,4 +12,4 @@ const schema = new mongoose.Schema({
     deleted: Date
 });
 
-export default mongoose.model<User & mongoose.Document>('User', schema, 'User');
+export default mongoose.model<IUser & mongoose.Document>('User', schema, 'User');

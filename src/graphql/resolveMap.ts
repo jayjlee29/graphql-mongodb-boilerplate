@@ -2,7 +2,7 @@
 import { IResolvers } from 'graphql-tools';
 import {UserSchema, ChannelSchema, ChannelMessageSchema} from '../mongoose/schema'
 import ChannelServiceImpl from '../service/ChannelServiceImpl'
-import {Channel, ChannelMessage} from '../models'
+import {IChannel, IChannelMessage, IAuthInfo} from '../models'
 import mongoose from 'mongoose';
 const channelService = new ChannelServiceImpl();
 
@@ -31,9 +31,8 @@ const resolverMap: IResolvers = {
         
       }
     },
-    publishChannelMessage(root: any, args: {channelId: string, payload: string}, context: any, info: any) {
-      const {pubsub, claims} = context;
-      console.log('id', JSON.stringify(claims))
+    publishChannelMessage(root: any, args: {channelId: string, payload: string}, context: {pubsub: any, authInfo: IAuthInfo}, info: any) {
+      const {pubsub, authInfo} = context;
       const {channelId, payload} = args
       //channelId 유효성 검사
       return ChannelSchema.findById(new mongoose.Types.ObjectId(channelId)).then((channel: any)=>{
@@ -41,10 +40,10 @@ const resolverMap: IResolvers = {
           throw new Error('invalid channel')
         }
         const channelMessage = new ChannelMessageSchema({channelId, payload})
-        channelMessage.userId = claims.id
+        channelMessage.userId = authInfo.id
         channelMessage.created = new Date();
         
-        return channelMessage.save().then((savedCm: ChannelMessage)=>{
+        return channelMessage.save().then((savedCm: IChannelMessage)=>{
             pubsub.publish(channelId, savedCm)
             return savedCm
         })
@@ -53,7 +52,7 @@ const resolverMap: IResolvers = {
   },
   Subscription: {
     channel: {
-      resolve: (channelMessage: ChannelMessage) => {
+      resolve: (channelMessage: IChannelMessage) => {
         // make subscription message(currnet type channelMessage)
         console.log('subscription published', JSON.stringify(channelMessage))
         return channelMessage

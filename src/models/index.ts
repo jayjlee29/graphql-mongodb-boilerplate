@@ -1,5 +1,5 @@
 
-interface User {
+interface IUser {
     id: string;
     username: string
     email: string;
@@ -10,7 +10,7 @@ interface User {
     deleted: Date;
 }
 
-interface Channel {
+interface IChannel {
     id: string;
     title: string;
     description: string;
@@ -21,26 +21,32 @@ interface Channel {
     deleted: Date;
 }
 
-interface ChannelMessage {
-    channelId: string,
-    payload: string,
-    targetIds: [string],
-    targetSent: [Date],
-    userId: string,
+interface IChannelMessage {
+    channelId: string;
+    payload: string;
+    targetIds: [string];
+    targetSent: [Date];
+    userId: string;
     created: Date;
     updated: Date;
     deleted: Date;
 }
 
-interface Connection {
-    id: string,
-    clientId: string,
-    userId: string,
-    isConnected: boolean,
+interface IConnection {
+    id: string;
+    clientId: string;
+    userId: string;
+    isConnected: boolean;
     created: Date;
     updated: Date;
 }
 
+interface IAuthInfo {
+    id: string;
+    connected: Date;
+    name: string;
+}
 
-export { User, Channel, ChannelMessage, Connection }
+
+export { IUser, IChannel, IChannelMessage, IConnection, IAuthInfo }
 

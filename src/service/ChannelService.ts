@@ -1,8 +1,8 @@
 'use strict'
-import {User, Channel, ChannelMessage} from '../models'
+import {IUser, IChannel, IChannelMessage} from '../models'
 
 interface ChannelService {
-    getChannels( args: {limit : number, skip: number}): Promise<Channel[]>
+    getChannels( args: {limit : number, skip: number}): Promise<IChannel[]>
 }
 
 export default ChannelService

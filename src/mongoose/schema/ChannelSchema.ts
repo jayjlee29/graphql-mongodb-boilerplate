@@ -1,9 +1,9 @@
 'use strict'
 import mongoose from 'mongoose';
-import {Channel} from '../../models'
+import {IChannel} from '../../models'
 
 const schema = new mongoose.Schema({
-    title: {type: String},
+    title: {type: String, required: true},
     description: String,
     memberIds: [String],
     userId: {type: String},
@@ -15,4 +15,4 @@ const schema = new mongoose.Schema({
 schema.set('toJSON', {
     virtuals: true
 })
-export default mongoose.model<Channel & mongoose.Document >('Channel', schema, 'Channel');
+export default mongoose.model<IChannel & mongoose.Document >('Channel', schema, 'Channel');
