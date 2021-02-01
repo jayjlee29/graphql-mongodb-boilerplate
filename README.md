@@ -21,53 +21,11 @@ npm run dev
  - graphql-tool : https://www.graphql-tools.com/
 
 
- ## graphql example
- ### create channel
- ```
- mutation {
-  Channel {
-    createOne(record:{
-      title: "testchannel",
-      description: "재미있는 채널"
-    }) {
-      recordId
-      record {
-        channelId
-        title
-        description
-      }
-    }
-  }
-}
- ```
-
-
- ### subscription channel
- ```
- subscription {
-  channel(channelId: "{channelId}"){
-    channelId
-    payload,
-    created
-  }
-}
- ```
-
-
- ### publish message to channel
- ```
- mutation {
-    publishChannelMessage(channelId: {channelId}, payload: "메세지 입니다.!!!") {
-    channelId
-    payload
-  }
-}
- ```
-
-
  ## cloudrun
 
 ```
+gcloud projects list
+export PROJECT_ID=${}
 docker build -t gcr.io/${PROJECT_ID}/graphql-mongodb-server:latest .
 docker push gcr.io/${PROJECT_ID}/graphql-mongodb-server:latest
 ```
