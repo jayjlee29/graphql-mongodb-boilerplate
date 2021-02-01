@@ -63,3 +63,16 @@ npm run dev
   }
 }
  ```
+
+
+ ## cloudrun
+
+```
+docker build -t gcr.io/${PROJECT_ID}/graphql-mongodb-server:latest .
+docker push gcr.io/${PROJECT_ID}/graphql-mongodb-server:latest
+```
+
+
+```
+gcloud beta run deploy --image gcr.io/${PROJECT_ID}/graphql-mongodb-server:latest
+```

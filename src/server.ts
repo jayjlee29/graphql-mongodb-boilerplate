@@ -22,7 +22,7 @@ import { PubSub } from 'graphql-subscriptions';
 connect();
 
 //express + apollo
-const port = 8000;
+const port = process.env.PORT || 8000;
 const expressServer = express();
 expressServer.use('*', cors());
 expressServer.use(compression());
@@ -53,8 +53,7 @@ const apolloServer = new ApolloServer({
           const token = req.headers.authorization || '';
         
           if(token){
-            return verifyAccessToken(token).then((decoded)=>{
-              console.log('claims', JSON.stringify(decoded))
+            return verifyAccessToken(token).then((decoded)=>{ 
               return resolve({claims: decoded, pubsub})
             }).catch((err)=>{
               reject(err)
@@ -70,7 +69,7 @@ const apolloServer = new ApolloServer({
     })
   },
   formatError: (err) => {
-    console.error(err)
+    console.error(JSON.stringify(err))
     return err;
   }
 });
@@ -80,9 +79,9 @@ const apolloServer = new ApolloServer({
 /**
  * generate accessToken for test(24h expired)
  */
-expressServer.get('/accessToken/test', (req, res)=>{
-  
-  const userId: string = req.params.userId || '';
+expressServer.get('/accessToken/test', (req: any, res)=>{
+  const query = req.query
+  const userId: string = query.userId || '';
   const accessToken = generateAccessToken(userId, 60*60*24)
   const expiredAt = Date.now() + (60*60*2 * 1000)
   const body = {

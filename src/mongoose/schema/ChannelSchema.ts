@@ -2,20 +2,17 @@
 import mongoose from 'mongoose';
 import {Channel} from '../../models'
 
-
-interface IChannelSchema extends Channel, mongoose.Document {}
 const schema = new mongoose.Schema({
-    title: String,
+    title: {type: String},
     description: String,
     memberIds: [String],
-    userId: String,
+    userId: {type: String},
     created: {type: Date, default: Date.now},
     updated: Date,
     deleted: Date
 })
 
-schema.virtual('channelId').get(function (this: { _id: any }) {
-    return this._id
+schema.set('toJSON', {
+    virtuals: true
 })
-
-export default mongoose.model<IChannelSchema>('Channel', schema);
+export default mongoose.model<Channel & mongoose.Document >('Channel', schema, 'Channel');

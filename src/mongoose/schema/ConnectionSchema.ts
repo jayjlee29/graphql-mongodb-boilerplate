@@ -1,20 +1,13 @@
 'use strict'
 import mongoose from 'mongoose';
-
-interface Connection extends mongoose.Document {
-    id: String,
-    isConnected: Boolean,
-    created: Date;
-    updated: Date;
-    deleted: Date;
-}
+import { Connection } from '../../models'
 
 const schema = new mongoose.Schema({
-    id: String,
     isConnected: Boolean,
+    clientId: String,
     created: {type: Date, default: Date.now},
     updated: Date,
     deleted: Date
 });
 
-export default mongoose.model<Connection>('Connection', schema);
+export default mongoose.model<Connection & mongoose.Document>('Connection', schema, 'Connection');

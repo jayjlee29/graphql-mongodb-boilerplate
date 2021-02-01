@@ -2,9 +2,7 @@
 import mongoose from 'mongoose';
 import { User } from '../../models'
 
-interface IUserSchema extends User, mongoose.Document {}
 const schema = new mongoose.Schema({
-    userId: String,
     username: String,
     email: String,
     mobileNumber: String,
@@ -14,4 +12,4 @@ const schema = new mongoose.Schema({
     deleted: Date
 });
 
-export default mongoose.model<IUserSchema>('User', schema);
+export default mongoose.model<User & mongoose.Document>('User', schema, 'User');

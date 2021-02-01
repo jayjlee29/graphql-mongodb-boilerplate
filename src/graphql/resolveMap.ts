@@ -2,6 +2,8 @@
 import { IResolvers } from 'graphql-tools';
 import {UserSchema, ChannelSchema, ChannelMessageSchema} from '../mongoose/schema'
 import ChannelServiceImpl from '../service/ChannelServiceImpl'
+import {Channel, ChannelMessage} from '../models'
+import mongoose from 'mongoose';
 const channelService = new ChannelServiceImpl();
 
 const resolverMap: IResolvers = {
@@ -12,7 +14,7 @@ const resolverMap: IResolvers = {
       return channelService.getChannels({limit, skip: 0});
     },
     getChannelMessages(root: any, args: any, context: any, info: any) {
-      const {pubsub} = context
+      const { pubsub } = context
       const { channelId, limit } = args
       const skip = 0;
       return ChannelMessageSchema.find({channelId}, null, {limit, skip})
@@ -29,51 +31,41 @@ const resolverMap: IResolvers = {
         
       }
     },
-    publishChannelMessage(root: any, args: any, context: any, info: any) {
-      const {pubsub} = context;
-      const {channelId, payload} = args;
-      const messageBody = Object.assign(payload, {channelId, sent: Date.now()})
+    publishChannelMessage(root: any, args: {channelId: string, payload: string}, context: any, info: any) {
+      const {pubsub, claims} = context;
+      console.log('id', JSON.stringify(claims))
+      const {channelId, payload} = args
       //channelId 유효성 검사
-
-      return ChannelSchema.findById(channelId).then((channel: any)=>{
-        console.log('findById', channel)
-        const cm = new ChannelMessageSchema()
-
-        return cm.save(messageBody)
-          .then((channelMessage: any)=>{
-            pubsub.publish(channelId, messageBody)
-            return {
-              channelId,
-              payload: messageBody
-            }
-        }).catch((e: Error)=>{
-          throw e
+      return ChannelSchema.findById(new mongoose.Types.ObjectId(channelId)).then((channel: any)=>{
+        if(!channel || !channel.id){
+          throw new Error('invalid channel')
+        }
+        const channelMessage = new ChannelMessageSchema({channelId, payload})
+        channelMessage.userId = claims.id
+        channelMessage.created = new Date();
+        
+        return channelMessage.save().then((savedCm: ChannelMessage)=>{
+            pubsub.publish(channelId, savedCm)
+            return savedCm
         })
-      }).catch((e: Error)=>{
-        console.error(e);
-      });      
+      })    
     },
   },
   Subscription: {
     channel: {
-      resolve: (data: any) => {
-        // make subscription message
-        const { channelId } = data;
-        return {
-          channelId,
-          payload: data,
-          server: Date.now()
-        }
+      resolve: (channelMessage: ChannelMessage) => {
+        // make subscription message(currnet type channelMessage)
+        console.log('subscription published', JSON.stringify(channelMessage))
+        return channelMessage
       },
       subscribe: (root: any, args: any, context: any, info: Object) => {
         const { pubsub } = context;
         const { channelId } = args
         if(pubsub){
           return pubsub.asyncIterator(channelId)
+        } else {
+          throw new Error('pubsub is null')
         }
-
-        throw new Error('pubsub is null')
-        
       }
     }
   }

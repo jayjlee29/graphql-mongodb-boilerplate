@@ -188,6 +188,7 @@ schemaComposer.Mutation.addNestedFields({
     "Channel.createOne": ChannelTC.mongooseResolvers.createOne().wrapResolve(next=>rp=>{
         if(rp.context.claims){
             rp.args = wrappingClaim(rp.args, rp.context.claims)
+            console.log('rp.args', JSON.stringify(rp.args))
         }
         return next(rp);
     }),
@@ -265,6 +266,7 @@ schemaComposer.Mutation.addNestedFields({
         if(rp.context.claims){
             rp.args = wrappingClaim(rp.args, rp.context.claims)
         }
+        console.log('rp.args', JSON.stringify(rp.args))
         return next(rp);
     }),
     "ChannelMessage.createMany": ChannelMessageTC.mongooseResolvers.createMany().wrapResolve(next=>rp=>{
@@ -313,8 +315,9 @@ schemaComposer.Mutation.addNestedFields({
 // end Channel Message
 
 const wrappingClaim = (args: {record: any}, claims: {id: string}) => {
-
-    return Object.assign(args, {record: {userId: claims.id}})
+    const {record} = args
+    const mergedParams = Object.assign(record, {userId: claims.id})
+    return {record: mergedParams};
 
 }
 

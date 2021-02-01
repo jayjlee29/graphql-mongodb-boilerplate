@@ -1,16 +1,17 @@
 
 interface User {
-    userId: String;
-    username: String
-    email: String;
-    mobileNumber: String;
-    password: String;
+    id: string;
+    username: string
+    email: string;
+    mobileNumber: string;
+    password: string;
     created: Date;
     updated: Date;
     deleted: Date;
 }
 
 interface Channel {
+    id: string;
     title: string;
     description: string;
     memberIds: [string];
@@ -21,21 +22,23 @@ interface Channel {
 }
 
 interface ChannelMessage {
-    channelId: String,
-    payload: String,
-    targetIds: [String],
-    targetSent: [Boolean],
+    channelId: string,
+    payload: string,
+    targetIds: [string],
+    targetSent: [Date],
+    userId: string,
     created: Date;
     updated: Date;
     deleted: Date;
 }
 
 interface Connection {
-    id: String,
-    isConnected: Boolean,
+    id: string,
+    clientId: string,
+    userId: string,
+    isConnected: boolean,
     created: Date;
     updated: Date;
-    deleted: Date;
 }
 
 
