@@ -35,7 +35,7 @@ const resolverMap: IResolvers = {
       const {pubsub, authInfo} = context;
       const {channelId, payload} = args
       //channelId 유효성 검사
-      return ChannelSchema.findById(new mongoose.Types.ObjectId(channelId)).then((channel: any)=>{
+      return ChannelSchema.findById(new mongoose.Types.ObjectId(channelId)).then((channel)=>{
         if(!channel || !channel.id){
           throw new Error('invalid channel')
         }
