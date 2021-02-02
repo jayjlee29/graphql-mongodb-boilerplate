@@ -13,12 +13,12 @@ const verifyAccessToken = async (authorization: string) => {
             jwt.verify(token, secret, (err: any, decoded: any) => {
                 if (err) {
                     console.error(err);
-                    reject(new Error('Auth Error from authChecker'));
+                    reject(new Error('jwt is not verified'));
                 } else {
                     const authInfo : IAuthInfo = {
                         id: decoded.id,
                         name: '',
-                        connected: new Date()
+                        connectedAt: new Date()
                     }
                     resolve(authInfo)
                 }

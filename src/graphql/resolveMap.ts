@@ -41,7 +41,7 @@ const resolverMap: IResolvers = {
         }
         const channelMessage = new ChannelMessageSchema({channelId, payload})
         channelMessage.userId = authInfo.id
-        channelMessage.created = new Date();
+        channelMessage.createdAt = new Date();
         
         return channelMessage.save().then((savedCm: IChannelMessage)=>{
             pubsub.publish(channelId, savedCm)

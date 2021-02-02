@@ -5,9 +5,9 @@ interface IUser {
     email: string;
     mobileNumber: string;
     password: string;
-    created: Date;
-    updated: Date;
-    deleted: Date;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date;
 }
 
 interface IChannel {
@@ -16,9 +16,9 @@ interface IChannel {
     description: string;
     memberIds: [string];
     userId: string;
-    created: Date;
-    updated: Date;
-    deleted: Date;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date;
 }
 
 interface IChannelMessage {
@@ -27,9 +27,9 @@ interface IChannelMessage {
     targetIds: [string];
     targetSent: [Date];
     userId: string;
-    created: Date;
-    updated: Date;
-    deleted: Date;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date;
 }
 
 interface IConnection {
@@ -37,16 +37,21 @@ interface IConnection {
     clientId: string;
     userId: string;
     isConnected: boolean;
-    created: Date;
-    updated: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 interface IAuthInfo {
     id: string;
-    connected: Date;
+    connectedAt: Date;
     name: string;
 }
 
+interface ISubscriptionMessage {
+    channel: IChannel;
+    message: [IChannelMessage];
+    createdAt: Date;
+}
 
-export { IUser, IChannel, IChannelMessage, IConnection, IAuthInfo }
+export { IUser, IChannel, IChannelMessage, IConnection, IAuthInfo, ISubscriptionMessage }
 
