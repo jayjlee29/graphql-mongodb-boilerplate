@@ -25,10 +25,19 @@ mutation {
  ```
 subscription {
   channel(channelId: "6017e3b4b6083be511a14b17"){
-    channelId
-    payload
+    channel {
+      id
+      title
+      description
+    }
+    message{
+      payload
+      channelId
+      createdAt
+      userId
+      targetIds
+    }
     created
-    userId
   }
 }
  ```
@@ -37,11 +46,11 @@ subscription {
  ### publish message to channel
  ```
 mutation {
-    publishChannelMessage(channelId: "6017e3b4b6083be511a14b17", payload: "테스트 메세지 입니다.!!!") {
+    publishChannelMessage(channelId: "6017e3b4b6083be511a14b17", 
+      payload: "테스트 메세지 입니다.!!!") {
     channelId
-    payload
-    created
-    userId
+    payload	
+		createdAt
   }
 }
  ```

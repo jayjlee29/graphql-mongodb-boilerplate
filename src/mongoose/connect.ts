@@ -18,7 +18,7 @@ export default () => {
         });
         console.log(URI)
         //mongoose.connect(`mongodb://${URI}/${DB}`, { useNewUrlParser: true, useUnifiedTopology: true  });
-        mongoose.connect(URI, { useNewUrlParser: true, useUnifiedTopology: true  });
+        mongoose.connect(URI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex:true });
 
     }
 

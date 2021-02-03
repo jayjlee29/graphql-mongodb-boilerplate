@@ -1,5 +1,6 @@
-scalar Date
 
+
+const typedef = `
 type Query {
   getChannelMessages(channelId: String!, limit: Int!): [ChannelMessage]
   getChannels(limit: Int!): [Channel]
@@ -12,18 +13,14 @@ type Mutation {
 }
 
 type Subscription {
-  channel(channelId: String!): ChannelMessage
+  channel(channelId: String!): SubscriptionMessage
+}
+type SubscriptionMessage {
+  channel: Channel
+  message: [ChannelMessage]
+  createdAt: Date
 }
 
-type Channel {
-  id: String
-}
-type ChannelMessage {
-  id: String
-}
-type User {
-  id: String
-}
-type Connection {
-  id: String
-}
+`
+
+export default typedef

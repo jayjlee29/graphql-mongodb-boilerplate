@@ -11,7 +11,9 @@ const schema = new mongoose.Schema({
     updatedAt: Date,
     deletedAt: Date
 })
-
+schema.virtual('id').get(function (this: { _id: any }) {
+    return this._id
+})
 schema.set('toJSON', {
     virtuals: true
 })

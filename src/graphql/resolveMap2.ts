@@ -2,15 +2,15 @@
 import { IResolvers } from 'graphql-tools';
 import {UserSchema, ChannelSchema, ChannelMessageSchema} from '../mongoose/schema'
 import ChannelServiceImpl from '../service/ChannelServiceImpl'
-import {IChannel, IChannelMessage, IAuthInfo, ISubscriptionMessage} from '../models'
+import {IChannel, IChannelMessage, IAuthInfo} from '../models'
 import mongoose from 'mongoose';
 const channelService = new ChannelServiceImpl();
 
-const resolverMap: IResolvers = {
+const resolverMap : IResolvers= {
   Query: {
-    getChannels(root: any, args: {limit: number, skip: number}, context: any, info: any) {
+    getChannels(root: any, args: any, context: any, info: any) {
       const {pubsub} = context
-      const { limit, skip } = args     
+      const { limit, skip } = args
       return channelService.getChannels({limit, skip: 0});
     },
     getChannelMessages(root: any, args: any, context: any, info: any) {
@@ -31,7 +31,7 @@ const resolverMap: IResolvers = {
         
       }
     },
-    publishChannelMessage(root: any, args: {channelId: string, payload: string}, context: {pubsub: any, authInfo: IAuthInfo}, info: any) {
+    publishChannelMessage(root: any, args: any, context: any, info: any) {
       const {pubsub, authInfo} = context;
       const {channelId, payload} = args
       //channelId 유효성 검사
@@ -52,24 +52,13 @@ const resolverMap: IResolvers = {
   },
   Subscription: {
     channel: {
-      resolve: (channelMessage: IChannelMessage) : Promise<ISubscriptionMessage> => {
+      resolve: (root: any, args: any, context: any, info: any) : any => {
         // make subscription message(currnet type channelMessage)
-        console.log('subscription published', JSON.stringify(channelMessage))
-
-        return ChannelSchema.findById(channelMessage.channelId).then((channel : any)=>{
-          if(!channel){
-            throw new Error('invalid channel')
-          }
-          const response : ISubscriptionMessage = {
-            channel,
-            message: [channelMessage],
-            createdAt: new Date()
-          }
-          return response
-        })  
-        
+        //console.log('subscription published', JSON.stringify(channelMessage))
+        const channelMessage = args
+        return channelMessage
       },
-      subscribe: (root: any, args: any, context: any, info: Object) => {
+      subscribe: (root: any, args: any, context: any, info: any) : any => {
         const { pubsub } = context;
         const { channelId } = args
         if(pubsub){

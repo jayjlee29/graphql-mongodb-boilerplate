@@ -9,6 +9,20 @@ const ChannelTC = composeMongoose(ChannelSchema, {});
 const ChannelMessageTC = composeMongoose(ChannelMessageSchema, {});
 const ConnectionTC = composeMongoose(ConnectionSchema, {});
 
+//virtual get id
+UserTC.addFields({
+    id: 'ID'
+})
+ChannelTC.addFields({
+    id: 'ID'
+})
+ChannelMessageTC.addFields({
+    id: 'ID'
+})
+ConnectionTC.addFields({
+    id: 'ID'
+})
+
 //User
 schemaComposer.Query.addNestedFields({
     "User.findById": UserTC.mongooseResolvers.findById(),
