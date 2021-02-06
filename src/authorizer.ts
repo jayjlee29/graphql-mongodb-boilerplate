@@ -17,7 +17,7 @@ const verifyAccessToken = async (authorization: string) => {
                 } else {
                     const authInfo : IAuthInfo = {
                         id: decoded.id,
-                        name: '',
+                        createdAt: new Date(),
                         connectedAt: new Date()
                     }
                     resolve(authInfo)

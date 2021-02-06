@@ -1,0 +1,20 @@
+type Query {
+  getChannelMessages(channelId: String!, latestMessageId: String, size: Int): [ChannelMessage]
+  getChannels(pageSize: Int!, pageNo: Int!): [Channel]
+}
+
+type Mutation {
+  createChannel(title: String!, description: String!) : Channel
+  joinChannel(channelId: String!) : Channel
+  inviteMemberChannel(channelId: String!, userIds: [String]!) : Channel
+  publishChannelMessage(channelId: String!, payload: String!): ChannelMessage
+}
+
+type Subscription {
+  channel(channelId: String!): SubscriptionMessage
+}
+type SubscriptionMessage {
+  channel: Channel
+  message: [ChannelMessage]
+  createdAt: Date
+}

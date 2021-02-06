@@ -1,14 +1,12 @@
 'use strict'
-import path from 'path'
 import 'graphql-import-node';
-//import { makeExecutableSchema, mergeSchemas} from 'graphql-tools';
 import { mergeTypeDefs, mergeResolvers, mergeSchemas } from '@graphql-tools/merge'
-import { loadFilesSync } from '@graphql-tools/load-files'
-import { makeExecutableSchema } from '@graphql-tools/schema';
-import { GraphQLSchema } from 'graphql';
+// import { loadFilesSync } from '@graphql-tools/load-files'
+// import { makeExecutableSchema } from '@graphql-tools/schema';
+// import { GraphQLSchema } from 'graphql';
 import { schemaComposer,  } from 'graphql-compose';
 import mongooseSchema from './mongooseSchema'
-import typeDef from './gql/typedef.gql';
+import typeDef from './typedef.gql';
 import resolver from './resolveMap';
 
 

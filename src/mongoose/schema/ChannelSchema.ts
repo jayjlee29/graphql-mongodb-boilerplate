@@ -6,14 +6,15 @@ const schema = new mongoose.Schema({
     title: {type: String, required: true},
     description: String,
     memberIds: [String],
+    invitedIds: [String],
     userId: { type: String, ref: 'User' },
     createdAt: {type: Date, default: Date.now},
     updatedAt: Date,
     deletedAt: Date
 })
-schema.virtual('id').get(function (this: { _id: any }) {
-    return this._id
-})
+// schema.virtual('id').get(function (this: { _id: any }) {
+//     return this._id
+// })
 schema.set('toJSON', {
     virtuals: true
 })

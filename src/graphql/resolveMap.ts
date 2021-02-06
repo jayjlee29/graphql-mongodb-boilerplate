@@ -8,30 +8,76 @@ const channelService = new ChannelServiceImpl();
 
 const resolverMap: IResolvers = {
   Query: {
-    getChannels(root: any, args: {limit: number, skip: number}, context: any, info: any) {
-      const {pubsub} = context
-      const { limit, skip } = args     
-      return channelService.getChannels({limit, skip: 0});
+    getChannels(root: any, args: {pageSize: number, pageNo: number}, context: {authInfo: IAuthInfo}, info: any) : Promise<IChannel[]>{
+      const {authInfo} = context
+      const {pageSize, pageNo}= args;
+      const limit = pageSize;
+      const skip = (pageNo - 1) * pageSize;
+      return channelService.getChannels({limit, skip});
     },
-    getChannelMessages(root: any, args: any, context: any, info: any) {
-      const { pubsub } = context
-      const { channelId, limit } = args
+    getChannelMessages(root: any, args: {channelId: string, latestMessageId: string, size: number}, context: {authInfo: IAuthInfo}, info: any) : Promise<IChannelMessage[]> {
+      const { authInfo } = context
+      const { channelId, latestMessageId, size } = args
       const skip = 0;
-      return ChannelMessageSchema.find({channelId}, null, {limit, skip})
+      const limit = !isNaN(size) && size>0? size : 10
+      const startAtPromise: Promise<Date> = latestMessageId?ChannelMessageSchema.findById(latestMessageId).then((m)=>m?m.createdAt:new Date()) : Promise.resolve(new Date())
+      return startAtPromise.then((startAt)=>{
+        if(!startAt){
+          throw new Error('');
+        }
+
+        return ChannelMessageSchema.find({channelId: channelId, created: {"$gte": startAt}}, null, {limit, skip})
+      })
+
+      
     },
   },
   Mutation: {
-    createChannel(root: any, args: any, context: any, info: any) {
-      return {
+    createChannel(root: any, args: {title: string, description: string}, context: {authInfo: IAuthInfo}, info: any) : Promise<IChannel> {
+      const {title, description} = args;
+      const {authInfo} = context;
+      const channel = new ChannelSchema();
+      channel.title = title
+      channel.description = description
+      channel.createdAt = new Date();
+      channel.memberIds = [authInfo.id];
 
-      }
+      return channel.save()
     },
-    addMemberChannel(root: any, args: any, context: any, info: any) {
-      return {
+    joinChannel(root: any, args: {channelId: string}, context: {authInfo: IAuthInfo}, info: any) : Promise<IChannel> {
+      const {channelId} = args;
+      const {authInfo} = context;
+      return ChannelSchema.findById(channelId).then((channel)=>{
+
+        if(!channel){
+          throw new Error('channel is not exist')
+        }
+        channel?.memberIds.push(authInfo.id)
+        channel.memberIds = Array.from(new Set(channel.memberIds))
+        return channel.save()
+      })
+      
+    },
+    inviteMemberChannel(root: any, args: {channelId: string, userIds: [string]}, context: {authInfo: IAuthInfo}, info: any) : Promise<IChannel> {
+      const {channelId, userIds} = args;
+      const {authInfo} = context;
+      return ChannelSchema.findById(channelId).then((channel)=>{
+
+        if(!channel){
+          throw new Error('channel is not exist')
+        }
+        if(!channel.invitedIds){
+          channel.invitedIds = userIds
+        } else {
+          channel.invitedIds = channel.invitedIds.concat(userIds)
+          channel.invitedIds = Array.from(new Set(channel.invitedIds))
+        }
         
-      }
+        
+        return channel.save()
+      })
     },
-    publishChannelMessage(root: any, args: {channelId: string, payload: string}, context: {pubsub: any, authInfo: IAuthInfo}, info: any) {
+    publishChannelMessage(root: any, args: {channelId: string, payload: string}, context: {pubsub: any, authInfo: IAuthInfo}, info: any) : Promise<IChannelMessage> {
       const {pubsub, authInfo} = context;
       const {channelId, payload} = args
       //channelId 유효성 검사
