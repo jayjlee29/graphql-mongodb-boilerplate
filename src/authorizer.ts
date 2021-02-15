@@ -3,7 +3,7 @@ import * as jwt from 'jsonwebtoken';
 import {IAuthInfo} from './models'
 const SECRET: string = process.env.SECRET || ''
 const ISSUER: string = 'tenwell.com'
-const verifyAccessToken = async (authorization: string) => {
+const verifyAccessToken = (authorization: string) :  Promise<IAuthInfo> => {
     
     if (authorization) {
         const token = authorization.split('Bearer ')[1];
@@ -23,19 +23,18 @@ const verifyAccessToken = async (authorization: string) => {
                     resolve(authInfo)
                 }
             });
-
         })
     } else {
-        return Promise.resolve(null)
+        return Promise.resolve(null as any)
     } 
 } 
 
-const generateAccessToken = (idToken: string, expiredIn: number) => {
+const generateAccessToken = (idToken: string, expiresIn: number) : string => {
     return jwt.sign({
         id: idToken, /**임시 */
         created: Date.now()
     }, SECRET, {
-        expiresIn: expiredIn,
+        expiresIn: expiresIn,
         issuer: ISSUER,
         subject: 'accessToken'
     })

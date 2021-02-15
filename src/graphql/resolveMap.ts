@@ -2,7 +2,7 @@
 import { IResolvers } from 'graphql-tools';
 import {UserSchema, ChannelSchema, ChannelMessageSchema} from '../mongoose/schema'
 import ChannelServiceImpl from '../service/ChannelServiceImpl'
-import {IChannel, IChannelMessage, IAuthInfo, ISubscriptionMessage} from '../models'
+import {IChannel, IChannelMessage, IAuthInfo, ISubscriptionMessage, IConnection} from '../models'
 import mongoose from 'mongoose';
 const channelService = new ChannelServiceImpl();
 
@@ -20,13 +20,13 @@ const resolverMap: IResolvers = {
       const { channelId, latestMessageId, size } = args
       const skip = 0;
       const limit = !isNaN(size) && size>0? size : 10
-      const startAtPromise: Promise<Date> = latestMessageId?ChannelMessageSchema.findById(latestMessageId).then((m)=>m?m.createdAt:new Date()) : Promise.resolve(new Date())
+      const startAtPromise: Promise<Date> = latestMessageId?ChannelMessageSchema.findById(latestMessageId).then((m)=>m?m.createdAt:new Date()) : Promise.resolve(new Date(0))
       return startAtPromise.then((startAt)=>{
         if(!startAt){
           throw new Error('');
         }
-
-        return ChannelMessageSchema.find({channelId: channelId, created: {"$gte": startAt}}, null, {limit, skip})
+        console.log('startAt', startAt)
+        return ChannelMessageSchema.find({channelId: channelId, createdAt: {"$gte": startAt}}, null, {limit, skip}).sort({createdAt: -1})
       })
 
       
@@ -80,6 +80,7 @@ const resolverMap: IResolvers = {
     publishChannelMessage(root: any, args: {channelId: string, payload: string}, context: {pubsub: any, authInfo: IAuthInfo}, info: any) : Promise<IChannelMessage> {
       const {pubsub, authInfo} = context;
       const {channelId, payload} = args
+      console.log('authInfo', JSON.stringify(authInfo))
       //channelId 유효성 검사
       return ChannelSchema.findById(new mongoose.Types.ObjectId(channelId)).then((channel)=>{
         if(!channel || !channel.id){
@@ -102,6 +103,10 @@ const resolverMap: IResolvers = {
         // make subscription message(currnet type channelMessage)
         console.log('subscription published', JSON.stringify(channelMessage))
 
+        if(!channelMessage){
+          return Promise.reject(new Error('message is null'));
+        }
+
         return ChannelSchema.findById(channelMessage.channelId).then((channel : any)=>{
           if(!channel){
             throw new Error('invalid channel')
@@ -115,9 +120,13 @@ const resolverMap: IResolvers = {
         })  
         
       },
-      subscribe: (root: any, args: any, context: any, info: Object) => {
-        const { pubsub } = context;
+      subscribe: (root: any, args: any, context: {pubsub: any, authInfo: IAuthInfo, connection: IConnection}, info: Object) => {
+        const { pubsub, authInfo, connection } = context;
         const { channelId } = args
+        console.log('subscribe', channelId, connection)
+        if(!authInfo || !authInfo.id){
+          throw new Error('UnAuthorized')
+        }
         if(pubsub){
           return pubsub.asyncIterator(channelId)
         } else {

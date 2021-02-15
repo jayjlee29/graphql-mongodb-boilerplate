@@ -35,11 +35,10 @@ interface IChannelMessage {
 
 interface IConnection {
     id: string;
-    clientId: string;
     userId: string;
-    isConnected: boolean;
     createdAt: Date;
-    updatedAt: Date;
+    updatedAt?: Date;
+    ws: any;
 }
 
 interface IAuthInfo {

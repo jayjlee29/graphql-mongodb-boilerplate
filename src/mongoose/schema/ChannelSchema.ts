@@ -8,7 +8,7 @@ const schema = new mongoose.Schema({
     memberIds: [String],
     invitedIds: [String],
     userId: { type: String, ref: 'User' },
-    createdAt: {type: Date, default: Date.now},
+    createdAt: {type: Date, default: Date.now, index: true},
     updatedAt: Date,
     deletedAt: Date
 })

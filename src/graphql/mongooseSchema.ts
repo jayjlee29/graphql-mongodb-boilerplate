@@ -20,7 +20,7 @@ ChannelMessageTC.addFields({
     id: 'ID'
 })
 ConnectionTC.addFields({
-    id: 'ID'
+     id: 'ID'
 })
 
 //User
@@ -118,7 +118,6 @@ schemaComposer.Query.addNestedFields({
     "Connection.count": ConnectionTC.mongooseResolvers.count(),
     "Connection.connection": ConnectionTC.mongooseResolvers.connection(),
     "Connection.pagination": UserTC.mongooseResolvers.pagination(),
-    
 });
   
 schemaComposer.Mutation.addNestedFields({

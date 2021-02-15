@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "mongodb": "docker run --rm --name local-mongo -p 27017:27017 -d mongo",
     "start": "node ./dist/server.js",
-    "dev": "nodemon 'src/server.ts' --exec 'ts-node' src/server.ts -e ts,graphql",
+    "dev": "nodemon 'src/server.ts' --exec 'ts-node' src/server.ts -e ts,graphql --unhandled-rejections=strict",
     "build": "tsc --build && npm run copy-resource",
     "clean": "rm -rf dist/  && tsc --build --clean",
     "copy-resource": "copyfiles -u 1 src/**/*.graphql dist/"
@@ -28,7 +28,9 @@
     "graphql-compose-mongoose": "^9.0.0",
     "graphql-subscriptions": "^1.1.0",
     "jsonwebtoken": "^8.5.1",
+    "log4js": "^6.3.0",
     "mongoose": "^5.10.13",
+    "nanoid": "^3.1.20",
     "restify": "^8.5.1",
     "subscriptions-transport-ws": "^0.9.18"
   },
