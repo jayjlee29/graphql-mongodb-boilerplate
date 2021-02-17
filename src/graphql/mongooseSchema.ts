@@ -1,7 +1,7 @@
 'use strict'
 import { composeMongoose } from 'graphql-compose-mongoose';
 import { schemaComposer } from 'graphql-compose';
-import {UserSchema, ChannelSchema, ConnectionSchema, ChannelMessageSchema} from '../mongoose/schema'
+import {UserSchema, ChannelSchema, ConnectionSchema, ChannelMessageSchema, ChannelMemberSchema} from '../mongoose/schema'
 import {IAuthInfo} from '../models'
 
 const UserTC = composeMongoose(UserSchema, {});
@@ -9,6 +9,7 @@ const ChannelTC = composeMongoose(ChannelSchema, {});
 const ChannelMessageTC = composeMongoose(ChannelMessageSchema, {});
 const ConnectionTC = composeMongoose(ConnectionSchema, {});
 
+const ChannelMemberTC = composeMongoose(ChannelMemberSchema, {});
 //virtual get id
 UserTC.addFields({
     id: 'ID'
@@ -22,7 +23,9 @@ ChannelMessageTC.addFields({
 ConnectionTC.addFields({
      id: 'ID'
 })
-
+ChannelMemberTC.addFields({
+    id: 'ID'
+})
 //User
 schemaComposer.Query.addNestedFields({
     "User.findById": UserTC.mongooseResolvers.findById(),
@@ -320,6 +323,10 @@ schemaComposer.Mutation.addNestedFields({
     })
 });
 // end Channel Message
+
+schemaComposer.Query.addNestedFields({
+    "ChannelMember.findById": ChannelMemberTC.mongooseResolvers.findById()
+})
 
 const wrappingClaim = (args: {record: any}, context: {authInfo: IAuthInfo}) => {
     const {record} = args

@@ -14,8 +14,7 @@ interface IChannel {
     id: string;
     title: string;
     description: string;
-    memberIds: string[];
-    invitedIds: string[];
+    status: string;
     userId: string;
     createdAt: Date;
     updatedAt: Date;
@@ -23,6 +22,7 @@ interface IChannel {
 }
 
 interface IChannelMessage {
+    id: string;
     channelId: string;
     payload: string;
     targetIds: string[];
@@ -33,6 +33,16 @@ interface IChannelMessage {
     deletedAt: Date;
 }
 
+interface IChannelMember {
+    id: string;
+    channelId: string;
+    memberId: string;
+    userId: string;
+    status: string;
+    createdAt: Date;
+    updatedAt: Date;
+    
+}
 interface IConnection {
     id: string;
     userId: string;
@@ -53,8 +63,9 @@ interface IAuthInfo {
 interface ISubscriptionMessage {
     channel: IChannel;
     message: IChannelMessage[];
+    targets: IChannelMember[];
     createdAt: Date;
 }
 
-export { IUser, IChannel, IChannelMessage, IConnection, IAuthInfo, ISubscriptionMessage }
+export { IUser, IChannel, IChannelMessage, IConnection, IAuthInfo, ISubscriptionMessage, IChannelMember }
 

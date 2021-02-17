@@ -5,9 +5,8 @@ const Schema = mongoose.Schema;
 const schema = new mongoose.Schema({
     title: {type: String, required: true},
     description: String,
-    memberIds: [String],
-    invitedIds: [String],
-    userId: { type: String, ref: 'User' },
+    userId: { type: String, ref: 'User', index: true },
+    status: { type: String, enum: ["ONAIR", "PENDING", "DELETED"]},
     createdAt: {type: Date, default: Date.now, index: true},
     updatedAt: Date,
     deletedAt: Date

@@ -34,8 +34,8 @@ const apolloServer = new ApolloServer({
         
         return verifyAccessToken(connectionParams.authToken).then((authInfo: IAuthInfo)=>{
             return connectionService.createConnection(connectionId, authInfo).then((connection : IConnection)=>{
-            console.log('onConnect connection', connection)
-            console.log('onConnect authInfo', authInfo)
+            //console.log('onConnect connection', connection, authInfo)
+            
             connection.ws = ws
             return {pubsub, authInfo, connection}
           })
@@ -51,8 +51,8 @@ const apolloServer = new ApolloServer({
       
       const initialContext = await context.initPromise;
       const {authInfo, connection} = initialContext;
-      console.log('onDisconnection authInfo', JSON.stringify(authInfo))
-      console.log('onDisconnection connection', JSON.stringify(connection))
+      console.log('onDisconnection', JSON.stringify(connection), JSON.stringify(authInfo))
+      
       if(connection){
         await connectionService.releaseConnection(connection)
       }

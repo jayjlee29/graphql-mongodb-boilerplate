@@ -5,8 +5,8 @@ type Query {
 
 type Mutation {
   createChannel(title: String!, description: String!) : Channel
-  joinChannel(channelId: String!) : Channel
-  inviteMemberChannel(channelId: String!, userIds: [String]!) : Channel
+  joinChannel(channelId: String!) : [ChannelMember]
+  inviteChannelMember(channelId: String!, userIds: [String]!) : [ChannelMember]
   publishChannelMessage(channelId: String!, payload: String!): ChannelMessage
 }
 

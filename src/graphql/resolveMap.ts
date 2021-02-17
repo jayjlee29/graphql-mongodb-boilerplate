@@ -1,8 +1,8 @@
 'use strict'
 import { IResolvers } from 'graphql-tools';
-import {UserSchema, ChannelSchema, ChannelMessageSchema} from '../mongoose/schema'
+import {UserSchema, ChannelSchema, ChannelMessageSchema, ChannelMemberSchema} from '../mongoose/schema'
 import ChannelServiceImpl from '../service/ChannelServiceImpl'
-import {IChannel, IChannelMessage, IAuthInfo, ISubscriptionMessage, IConnection} from '../models'
+import {IChannel, IChannelMessage, IAuthInfo, ISubscriptionMessage, IConnection, IChannelMember} from '../models'
 import mongoose from 'mongoose';
 const channelService = new ChannelServiceImpl();
 
@@ -34,47 +34,23 @@ const resolverMap: IResolvers = {
   },
   Mutation: {
     createChannel(root: any, args: {title: string, description: string}, context: {authInfo: IAuthInfo}, info: any) : Promise<IChannel> {
-      const {title, description} = args;
       const {authInfo} = context;
-      const channel = new ChannelSchema();
-      channel.title = title
-      channel.description = description
-      channel.createdAt = new Date();
-      channel.memberIds = [authInfo.id];
-
-      return channel.save()
+      const {title, description} = args;
+      return channelService.createChannel({title, description}, authInfo);
     },
-    joinChannel(root: any, args: {channelId: string}, context: {authInfo: IAuthInfo}, info: any) : Promise<IChannel> {
+    joinChannel(root: any, args: {channelId: string}, context: {authInfo: IAuthInfo}, info: any) : Promise<IChannelMember[]> {
       const {channelId} = args;
       const {authInfo} = context;
-      return ChannelSchema.findById(channelId).then((channel)=>{
-
-        if(!channel){
-          throw new Error('channel is not exist')
-        }
-        channel?.memberIds.push(authInfo.id)
-        channel.memberIds = Array.from(new Set(channel.memberIds))
-        return channel.save()
+      return channelService.joinChannel(channelId, authInfo).then((channelMember: IChannelMember)=>{
+        return channelService.getChannelMembers({channelId, limit: 100, skip: 0})
       })
       
     },
-    inviteMemberChannel(root: any, args: {channelId: string, userIds: [string]}, context: {authInfo: IAuthInfo}, info: any) : Promise<IChannel> {
+    inviteChannelMember(root: any, args: {channelId: string, userIds: [string]}, context: {authInfo: IAuthInfo}, info: any) : Promise<IChannelMember[]> {
       const {channelId, userIds} = args;
       const {authInfo} = context;
-      return ChannelSchema.findById(channelId).then((channel)=>{
-
-        if(!channel){
-          throw new Error('channel is not exist')
-        }
-        if(!channel.invitedIds){
-          channel.invitedIds = userIds
-        } else {
-          channel.invitedIds = channel.invitedIds.concat(userIds)
-          channel.invitedIds = Array.from(new Set(channel.invitedIds))
-        }
-        
-        
-        return channel.save()
+      return channelService.inviteChannel(channelId, authInfo, userIds).then((members: IChannelMember[])=>{
+        return channelService.getChannelMembers({channelId, limit: 100, skip: 0})
       })
     },
     publishChannelMessage(root: any, args: {channelId: string, payload: string}, context: {pubsub: any, authInfo: IAuthInfo}, info: any) : Promise<IChannelMessage> {
@@ -111,12 +87,17 @@ const resolverMap: IResolvers = {
           if(!channel){
             throw new Error('invalid channel')
           }
-          const response : ISubscriptionMessage = {
-            channel,
-            message: [channelMessage],
-            createdAt: new Date()
-          }
-          return response
+
+          return ChannelMemberSchema.find({channelId: channel.id, status: "ACTIVE"}, null).then((targets: IChannelMember[])=>{
+            const response : ISubscriptionMessage = {
+              channel,
+              message: [channelMessage],
+              targets,
+              createdAt: new Date()
+            }
+            return response
+          })
+          
         })  
         
       },
