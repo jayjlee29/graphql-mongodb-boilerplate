@@ -19,8 +19,8 @@ const apolloServer = new ApolloServer({
   introspection: true,
   formatError: (err) => {
     //logger.error(err)
-    console.error('formatError')
-    return new Error(`Error`);
+    console.error('formatError', err.message, err.stack)
+    return new Error(`Error ${err.message}`);
   },
   playground: {
     subscriptionEndpoint: '/graphql'
