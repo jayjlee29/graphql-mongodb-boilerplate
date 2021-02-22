@@ -1,24 +1,21 @@
 'use strict'
 import os from 'os'
-
 import express from 'express';
-
 import bodyParser from 'body-parser'
-
 import { createServer } from 'http';
-
-
 import compression from 'compression';
 import cors from 'cors';
 import connect from './mongoose/connect'
-
 import { configure, getLogger } from "log4js";
-
 import apolloServer from './apolloServer'
 import {generateAccessToken} from './authorizer'
-
+import {getRandomId} from './common/utils'
+import {IUser} from './models'
+import userService from './service/UserServiceImpl'
 const logger = getLogger(__filename.slice(__dirname.length + 1));
 logger.level = "debug"
+const TOKEN_EXPIRES_IN = 60*60*24
+
 console.log = (...args: any[]) => {
   
   logger.debug(args)
@@ -38,25 +35,63 @@ const expressServer = express();
 //express use, get
 expressServer.use('*', cors());
 expressServer.use(compression());
-expressServer.get('/accessToken/test', (req: any, res)=>{
-  const query = req.query
-  const idToken: string = query.idToken || '';
-  if(!idToken || idToken === '' || idToken === 'undefined' || idToken === 'null'){
-    throw new Error('idToken is null')
+expressServer.get('/signin/anonymous', async (req: any, res)=>{
+  const displayName: string = req.query.displayName;
+
+  if(!displayName || displayName === '' || displayName === 'undefined' || displayName === 'null'){
+    throw new Error('displayName is null')
+  }
+  const user: IUser = {
+    userId: `${displayName}-${getRandomId()}`,
+    displayName,
+    createdAt: new Date()
   }
 
-  const t = 5 //60*60*24
-  const accessToken = generateAccessToken(idToken, t)
-  const expiredAt = Date.now() + (t * 1000)
+  const savedUser = await userService.saveUser(user);
+  console.log('savedUser', savedUser);
+  
+  const {accessToken, expiredAt} = generateAccessToken(user, TOKEN_EXPIRES_IN)
+  
   const body = {
     accessToken,
-    expiredAt
+    expiredAt,
+    user
   }
-  console.log('generated accessToken', idToken)
+  console.log('anonymous sign-in', displayName)
   res.json(body)
-  
-  
 })
+
+expressServer.get('/accessToken/:mode', async (req: any, res)=>{
+  const {mode} = req.params;
+  if('anonymous' != mode){
+    throw new Error('does\'t supported mode');
+  }
+  const {displayName, id} = req.query
+//  const idToken: string = query.idToken || '';
+  if(!id || id === '' || id === 'undefined' || id === 'null'){
+    throw new Error('id is null')
+  }
+
+
+  const user: IUser = {
+    userId: `${id}`,
+    displayName: `${displayName}`,
+    createdAt: new Date()
+  }
+ 
+  const {accessToken, expiredAt} = generateAccessToken(user, TOKEN_EXPIRES_IN)
+  
+
+  const body = {
+    accessToken,
+    expiredAt,
+    user
+  }
+  //console.log('generated accessToken', id)
+  res.json(body)
+
+})
+
 expressServer.use((err: Error, req: any, res: any, next: any)=>{
   logger.error('middleware error', err);
   if(res.headersSent){
@@ -67,7 +102,6 @@ expressServer.use((err: Error, req: any, res: any, next: any)=>{
 })
 //expressServer.use('/graphql', bodyParser.json());
 // end express use, get
-
 
 const httpServer = createServer(expressServer);
 
@@ -80,8 +114,8 @@ httpServer.listen({port}, ()=>{
   console.log(`start graphql server http://localhost:${port}/graphql, subscription endpoint : ${apolloServer.subscriptionsPath}`)
 
   const hostname = os.hostname();
-  const tokenInfo =  JSON.stringify({userId: hostname, accessToken: generateAccessToken(hostname, 60*60*24)})
-  console.log(tokenInfo)
+  //const tokenInfo =  JSON.stringify({userId: hostname, accessToken: generateAccessToken(hostname, 60*60*24)})
+  //console.log(tokenInfo)
   console.log('hostname', hostname)
 })
 

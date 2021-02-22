@@ -22,7 +22,7 @@ npm run dev
 
 
  ## cloudrun deploy
-
+region : us-central1
 ```
 gcloud config list
 gcloud projects list
@@ -30,9 +30,5 @@ export PROJECT_ID=$(gcloud config get-value project)
 npm run clean && npm run build
 docker build -t gcr.io/${PROJECT_ID}/graphql-mongodb-server:latest .
 docker push gcr.io/${PROJECT_ID}/graphql-mongodb-server:latest
-```
-
-
-```
 gcloud beta run deploy --image gcr.io/${PROJECT_ID}/graphql-mongodb-server:latest
 ```

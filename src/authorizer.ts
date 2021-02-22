@@ -1,6 +1,7 @@
 'use strict'
 import * as jwt from 'jsonwebtoken';
-import {IAuthInfo} from './models'
+import {IAuthInfo, IUser} from './models'
+
 const SECRET: string = process.env.SECRET || ''
 const ISSUER: string = 'tenwell.com'
 const verifyAccessToken = (authorization: string) :  Promise<IAuthInfo> => {
@@ -13,10 +14,15 @@ const verifyAccessToken = (authorization: string) :  Promise<IAuthInfo> => {
             jwt.verify(token, secret, (err: any, decoded: any) => {
                 if (err) {
                     console.error(err);
-                    reject(new Error('jwt is not verified'));
+                    reject(new Error('JWT is not verified'));
                 } else {
+                    console.log('decoded', decoded)
+                    if(!decoded.userId){
+                        throw new Error('invalid JWT')
+                    }
                     const authInfo : IAuthInfo = {
-                        id: decoded.id,
+                        id: decoded.userId,
+                        displayName: decoded.displayName,
                         createdAt: new Date(),
                         connectedAt: new Date()
                     }
@@ -29,15 +35,14 @@ const verifyAccessToken = (authorization: string) :  Promise<IAuthInfo> => {
     } 
 } 
 
-const generateAccessToken = (idToken: string, expiresIn: number) : string => {
-    return jwt.sign({
-        id: idToken, /**임시 */
-        created: Date.now()
-    }, SECRET, {
-        expiresIn: expiresIn,
-        issuer: ISSUER,
-        subject: 'accessToken'
+const generateAccessToken = (user: IUser, expiresIn: number) : {accessToken: string, expiredAt: number} => {
+
+    const expiredAt = Date.now() + (expiresIn * 1000)
+
+    const accessToken = jwt.sign(user, SECRET, {
+        expiresIn: expiresIn
     })
+    return {accessToken, expiredAt}
 
 } 
 

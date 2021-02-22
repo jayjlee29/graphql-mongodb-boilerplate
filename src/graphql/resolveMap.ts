@@ -104,14 +104,14 @@ const resolverMap: IResolvers = {
       subscribe: (root: any, args: any, context: {pubsub: any, authInfo: IAuthInfo, connection: IConnection}, info: Object) => {
         const { pubsub, authInfo, connection } = context;
         const { channelId } = args
-        console.log('subscribe', channelId, connection)
+        //console.log('subscribe', channelId, connection, authInfo)
         if(!authInfo || !authInfo.id){
           throw new Error('UnAuthorized')
         }
-        if(pubsub){
+        if(pubsub && channelId){
           return pubsub.asyncIterator(channelId)
         } else {
-          throw new Error('pubsub is null')
+          throw new Error(`Error subscribe ${authInfo}`)
         }
       }
     }

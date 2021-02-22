@@ -4,7 +4,7 @@ import { IConnection } from '../../models'
 const Schema = mongoose.Schema;
 
 const schema = new mongoose.Schema({
-    _id: {type: String, required: true, unique: true},
+    _id: {type: String},
     userId: String,
     createdAt: {type: Date, required: true, default: Date.now, index: true},
     updatedAt: Date,

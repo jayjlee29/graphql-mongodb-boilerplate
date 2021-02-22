@@ -4,11 +4,10 @@ import { IUser } from '../../models'
 
 const Schema = mongoose.Schema;
 const schema = new mongoose.Schema({
-    id: String,
+    userId: {type: String, unique: true},
     username: String,
+    displayName: String,
     email: String,
-    mobileNumber: String,
-    password: String,
     createdAt: {type: Date, default: Date.now},
     updatedAt: Date,
     deletedAt: Date

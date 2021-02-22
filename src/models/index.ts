@@ -1,13 +1,12 @@
 
 interface IUser {
-    id: string;
-    username: string
-    email: string;
-    mobileNumber: string;
-    password: string;
+    userId: string;
+    username?: string
+    displayName?: string
+    email?: string;
     createdAt: Date;
-    updatedAt: Date;
-    deletedAt: Date;
+    updatedAt?: Date;
+    deletedAt?: Date;
 }
 
 interface IChannel {
@@ -54,6 +53,7 @@ interface IConnection {
 interface IAuthInfo {
     id: string;
     name?: string;
+    displayName?: string;
     sub?: string;
     connectedAt: Date;
     createdAt: Date;
