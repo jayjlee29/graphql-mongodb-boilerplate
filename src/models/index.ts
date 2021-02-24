@@ -1,6 +1,6 @@
 
 interface IUser {
-    userId: string;
+    id: string;
     username?: string
     displayName?: string
     email?: string;
@@ -30,6 +30,15 @@ interface IChannelMessage {
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date;
+}
+
+interface ISentChannelMessage {
+    id: string;
+    channelId: string;
+    messageId: string;
+    userId: string;
+    fromUserId: string; 
+    createdAt: Date;
 }
 
 interface IChannelMember {
@@ -67,5 +76,14 @@ interface ISubscriptionMessage {
     createdAt: Date;
 }
 
-export { IUser, IChannel, IChannelMessage, IConnection, IAuthInfo, ISubscriptionMessage, IChannelMember }
+export { 
+    IUser, 
+    IChannel, 
+    IChannelMessage, 
+    IConnection, 
+    IAuthInfo, 
+    ISubscriptionMessage, 
+    IChannelMember,
+    ISentChannelMessage
+ }
 

@@ -21,14 +21,21 @@ npm run dev
  - graphql-tool : https://www.graphql-tools.com/
 
 
- ## cloudrun deploy
-region : us-central1
+## gcloud configuration & project list
 ```
 gcloud config list
 gcloud projects list
+```
+
+## cloudrun deploy
+
+> region : us-central1
+
+```
+
 export PROJECT_ID=$(gcloud config get-value project)
 npm run clean && npm run build
 docker build -t gcr.io/${PROJECT_ID}/graphql-mongodb-server:latest .
 docker push gcr.io/${PROJECT_ID}/graphql-mongodb-server:latest
-gcloud beta run deploy --image gcr.io/${PROJECT_ID}/graphql-mongodb-server:latest
+gcloud run deploy graphql-mongodb-server --image gcr.io/${PROJECT_ID}/graphql-mongodb-server:latest --platform managed --region us-central1
 ```

@@ -16,7 +16,7 @@ export default () => {
             // CONNECTED TO MONGODB SERVER
             console.log("Connected to mongod server");
         });
-        console.log(URI)
+        //console.log(URI)
         //mongoose.connect(`mongodb://${URI}/${DB}`, { useNewUrlParser: true, useUnifiedTopology: true  });
         mongoose.connect(URI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex:true });
 

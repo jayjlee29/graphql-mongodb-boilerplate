@@ -6,11 +6,10 @@ import { ConnectionContext } from 'subscriptions-transport-ws';
 import * as WebSocket from 'ws';
 import depthLimit from 'graphql-depth-limit';
 import schema from './graphql/schema';
-import ConnectionServiceImpl from './service/ConnectionServiceImpl'
+import connectionService from './service/ConnectionServiceImpl'
 import {verifyAccessToken, generateAccessToken} from './authorizer'
 import {IAuthInfo, IConnection} from './models'
 
-const connectionService = new ConnectionServiceImpl();
 const pubsub = new PubSub();
 
 const apolloServer = new ApolloServer({
@@ -30,7 +29,7 @@ const apolloServer = new ApolloServer({
     onConnect: (connectionParams: any, ws)=> {
       if(connectionParams && connectionParams.authToken){
         const {connectionId} = connectionParams;
-        console.log('connectionId', connectionId)
+        console.log('connectionParams', connectionParams)
         
         return verifyAccessToken(connectionParams.authToken).then((authInfo: IAuthInfo)=>{
             return connectionService.createConnection(connectionId, authInfo).then((connection : IConnection)=>{

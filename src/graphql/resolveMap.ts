@@ -1,10 +1,10 @@
 'use strict'
 import { IResolvers } from 'graphql-tools';
-import {UserSchema, ChannelSchema, ChannelMessageSchema, ChannelMemberSchema} from '../mongoose/schema'
-import ChannelServiceImpl from '../service/ChannelServiceImpl'
-import {IChannel, IChannelMessage, IAuthInfo, ISubscriptionMessage, IConnection, IChannelMember} from '../models'
+import {UserSchema, ChannelSchema, ChannelMessageSchema, ChannelMemberSchema, SentChannelMessageSchema} from '../mongoose/schema'
+import channelService from '../service/ChannelServiceImpl'
+import {IChannel, IChannelMessage, IAuthInfo, ISubscriptionMessage, IConnection, IChannelMember, ISentChannelMessage} from '../models'
 import mongoose from 'mongoose';
-const channelService = new ChannelServiceImpl();
+
 
 const resolverMap: IResolvers = {
   Query: {
@@ -88,16 +88,45 @@ const resolverMap: IResolvers = {
             throw new Error('invalid channel')
           }
 
-          return ChannelMemberSchema.find({channelId: channel.id, status: "ACTIVE"}, null).then((targets: IChannelMember[])=>{
-            const response : ISubscriptionMessage = {
-              channel,
-              message: [channelMessage],
-              targets,
-              createdAt: new Date()
-            }
-            return response
-          })
-          
+          return ChannelMemberSchema.find({channelId: channel.id, status: "ACTIVE"}, null)
+            .then((targetMembers: IChannelMember[])=>{
+
+              const saveSentHist = (channelMembers: IChannelMember[]) => {
+                return new Promise((resolve, reject)=>{
+                  const sentHistSchema : ISentChannelMessage[] = channelMembers.map((channelMember: IChannelMember)=>{
+                    const schema = new  SentChannelMessageSchema()
+                    
+                    schema.channelId = channel.id
+                    schema.messageId = channelMessage.id
+                    schema.fromUserId = channelMessage.userId
+                    schema.userId = channelMember.userId
+                      
+                    return schema;
+                  })
+  
+                  SentChannelMessageSchema.insertMany(sentHistSchema, (err, results)=>{
+  
+                    if(err){
+                      reject(err)
+                    } else {
+                      resolve(results);
+                    }
+                  })
+                })
+              }
+                
+                
+              return saveSentHist(targetMembers).then((results)=>{
+                const response : ISubscriptionMessage = {
+                  channel,
+                  message: [channelMessage],
+                  targets: targetMembers,
+                  createdAt: new Date()
+                }
+                return response
+              })
+            })
+ 
         })  
         
       },

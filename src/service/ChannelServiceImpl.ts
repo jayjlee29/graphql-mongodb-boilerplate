@@ -5,7 +5,19 @@ import ChannelService from './ChannelService'
 import { Mongoose } from 'mongoose'
 
 class ChannelServiceImpl implements ChannelService{
-    
+	private static _instance: ChannelService = new ChannelServiceImpl();
+
+	private constructor() {
+		ChannelServiceImpl._instance = this;
+	}
+
+	static getInstance() : ChannelService{
+		if (!ChannelServiceImpl._instance) {
+			ChannelServiceImpl._instance = new ChannelServiceImpl();
+		}
+		return this._instance;
+	}
+
     getChannels( args: {limit : number, skip: number}): Promise<IChannel[]> {
         const {limit, skip } = args
         return ChannelSchema.find({}, null, {limit, skip}).then((channels: IChannel[])=>{
@@ -90,4 +102,4 @@ class ChannelServiceImpl implements ChannelService{
 	}
 }
 
-export default ChannelServiceImpl
+export default ChannelServiceImpl.getInstance()

@@ -3,8 +3,8 @@ import {IUser, IChannel, IChannelMessage, IChannelMember, IAuthInfo} from '../mo
 
 interface UserService {
     saveUser(user: IUser): Promise<IUser>
-    getUser(): Promise<IUser>
-    getUsers(): Promise<IUser[]>
+    getUser(id: String): Promise<IUser>
+    getUsers(ids: String[]): Promise<IUser[]>
     
 }
 

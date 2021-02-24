@@ -5,19 +5,43 @@ import UserService from './UserService'
 import { Mongoose } from 'mongoose'
 
 class UserServiceImpl implements UserService{
-    
+    private static _instance: UserService = new UserServiceImpl();
+
+	private constructor() {
+		UserServiceImpl._instance = this;
+	}
+
+	static getInstance() : UserService{
+		if (!UserServiceImpl._instance) {
+			UserServiceImpl._instance = new UserServiceImpl();
+		}
+		return this._instance;
+	}
+
 	saveUser(user: IUser): Promise<IUser> {
-		const userSchema = new UserSchema(user);
+		const userSchema = new UserSchema(Object.assign({_id: user.id}, user));
 		return userSchema.save();
 	}
-    getUser(): Promise<IUser> {
 
-		return Promise.resolve(null as any)
+    getUser(id: String): Promise<IUser> {
+
+		return UserSchema.findById(id).then((user)=>{
+			if(!user){
+				return null as any
+			}
+			const r : IUser = Object.assign({
+				id: user.id
+			}, user.toJSON())
+
+			console.log('getUser', r, user);
+			return r
+		})
 
 	}
-    getUsers(): Promise<IUser[]> {
+    getUsers(ids: String[]): Promise<IUser[]> {
 		return Promise.resolve(null as any)
 	}
 }
 
-export default new UserServiceImpl()
+
+export default UserServiceImpl.getInstance()

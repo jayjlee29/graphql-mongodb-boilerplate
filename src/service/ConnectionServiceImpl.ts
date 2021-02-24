@@ -6,6 +6,19 @@ import { nanoid } from 'nanoid'
 
 class ConnectionServiceImpl implements ConnectionService{
     
+    private static _instance: ConnectionService = new ConnectionServiceImpl();
+
+	private constructor() {
+		ConnectionServiceImpl._instance = this;
+	}
+
+	static getInstance() : ConnectionService{
+		if (!ConnectionServiceImpl._instance) {
+			ConnectionServiceImpl._instance = new ConnectionServiceImpl();
+		}
+		return this._instance;
+	}
+
     createConnection(id: string, authInfo: IAuthInfo): Promise<IConnection> {
 
         const createConn = () => {
@@ -51,4 +64,4 @@ class ConnectionServiceImpl implements ConnectionService{
     }
 }
 
-export default ConnectionServiceImpl
+export default ConnectionServiceImpl.getInstance()

@@ -14,7 +14,8 @@ import {IUser} from './models'
 import userService from './service/UserServiceImpl'
 const logger = getLogger(__filename.slice(__dirname.length + 1));
 logger.level = "debug"
-const TOKEN_EXPIRES_IN = 60*60*24
+
+const TOKEN_EXPIRES_IN = 60;	//60s //60*60*24 //24h
 
 console.log = (...args: any[]) => {
   
@@ -35,72 +36,72 @@ const expressServer = express();
 //express use, get
 expressServer.use('*', cors());
 expressServer.use(compression());
-expressServer.get('/signin/anonymous', async (req: any, res)=>{
-  const displayName: string = req.query.displayName;
+expressServer.get('/signin/anonymous', async (req: any, res, next)=>{
+	const displayName: string = req.query.displayName;
 
-  if(!displayName || displayName === '' || displayName === 'undefined' || displayName === 'null'){
-    throw new Error('displayName is null')
-  }
-  const user: IUser = {
-    userId: `${displayName}-${getRandomId()}`,
-    displayName,
-    createdAt: new Date()
-  }
-
-  const savedUser = await userService.saveUser(user);
-  console.log('savedUser', savedUser);
-  
-  const {accessToken, expiredAt} = generateAccessToken(user, TOKEN_EXPIRES_IN)
-  
-  const body = {
-    accessToken,
-    expiredAt,
-    user
-  }
-  console.log('anonymous sign-in', displayName)
-  res.json(body)
+	if(!displayName || displayName === '' || displayName === 'undefined' || displayName === 'null'){
+		throw new Error('displayName is null')
+	}
+	const user: IUser = {
+		id: `${displayName}-${getRandomId()}`,
+		displayName,
+		createdAt: new Date()
+	}
+	try{
+		const savedUser = await userService.saveUser(user);
+		console.log('savedUser', savedUser);
+		
+		const {accessToken, expiredAt} = generateAccessToken(user, TOKEN_EXPIRES_IN)
+		
+		const body = {
+			accessToken,
+			expiredAt,
+			user
+		}
+		console.log('anonymous sign-in', displayName)
+		res.json(body)
+	} catch(err){
+		console.log('Error Signin', err)
+		next(new Error('Error Sigin'))
+	}
+	
 })
 
-expressServer.get('/accessToken/:mode', async (req: any, res)=>{
-  const {mode} = req.params;
-  if('anonymous' != mode){
-    throw new Error('does\'t supported mode');
-  }
-  const {displayName, id} = req.query
-//  const idToken: string = query.idToken || '';
-  if(!id || id === '' || id === 'undefined' || id === 'null'){
-    throw new Error('id is null')
-  }
-
-
-  const user: IUser = {
-    userId: `${id}`,
-    displayName: `${displayName}`,
-    createdAt: new Date()
-  }
- 
-  const {accessToken, expiredAt} = generateAccessToken(user, TOKEN_EXPIRES_IN)
-  
-
-  const body = {
-    accessToken,
-    expiredAt,
-    user
-  }
-  //console.log('generated accessToken', id)
-  res.json(body)
+expressServer.get('/accessToken/:mode', (req: any, res, next)=>{
+	const {mode} = req.params;
+	if('anonymous' != mode){
+		throw new Error('does\'t supported mode');
+	}
+	const {displayName, id} = req.query
+	//  const idToken: string = query.idToken || '';
+	if(!id || id === '' || id === 'undefined' || id === 'null'){
+		throw new Error('id is null')
+	}
+	userService.getUser(id).then((user: IUser)=>{
+		const {accessToken, expiredAt} = generateAccessToken(user, TOKEN_EXPIRES_IN)
+		const body = {
+			accessToken,
+			expiredAt,
+			user
+		}
+		//console.log('generated accessToken', id)
+		res.json(body)
+	}).catch((err)=>{
+		console.error('Error accessToken', err)
+		next(new Error('Error GenerateAccessToken'))
+	})
 
 })
 
 expressServer.use((err: Error, req: any, res: any, next: any)=>{
-  logger.error('middleware error', err);
+  logger.error('Error  Middleware', err);
   if(res.headersSent){
     return next(err)
   }
   res.status(500).send({error: err.message});
-  //res.render('error', { error: err });
+
 })
-//expressServer.use('/graphql', bodyParser.json());
+
 // end express use, get
 
 const httpServer = createServer(expressServer);

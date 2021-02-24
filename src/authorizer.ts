@@ -11,17 +11,19 @@ const verifyAccessToken = (authorization: string) :  Promise<IAuthInfo> => {
         const secret = process.env.SECRET + '';
         return new Promise((resolve, reject)=>{
 
-            jwt.verify(token, secret, (err: any, decoded: any) => {
+            jwt.verify(token, secret, (err: any, decoded: IUser | any) => {
                 if (err) {
                     console.error(err);
                     reject(new Error('JWT is not verified'));
                 } else {
-                    console.log('decoded', decoded)
-                    if(!decoded.userId){
+                    
+                    console.log('verified', JSON.stringify(decoded))
+
+                    if(!decoded.id){
                         throw new Error('invalid JWT')
                     }
                     const authInfo : IAuthInfo = {
-                        id: decoded.userId,
+                        id: decoded.id,
                         displayName: decoded.displayName,
                         createdAt: new Date(),
                         connectedAt: new Date()
@@ -38,8 +40,13 @@ const verifyAccessToken = (authorization: string) :  Promise<IAuthInfo> => {
 const generateAccessToken = (user: IUser, expiresIn: number) : {accessToken: string, expiredAt: number} => {
 
     const expiredAt = Date.now() + (expiresIn * 1000)
-
-    const accessToken = jwt.sign(user, SECRET, {
+    //console.log('generateAccessToken', user, expiresIn)
+    const claims = {
+        id: user.id,
+        displayName: user.displayName,
+        createdAt: new Date(user.createdAt),
+      }
+    const accessToken = jwt.sign(claims, SECRET, {
         expiresIn: expiresIn
     })
     return {accessToken, expiredAt}
