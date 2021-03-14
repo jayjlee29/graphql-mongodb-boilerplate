@@ -1,7 +1,7 @@
 'use strict'
 import * as jwt from 'jsonwebtoken';
 import {IAuthInfo, IUser} from './models'
-
+import logger from './common/logger'
 const SECRET: string = process.env.SECRET || ''
 const ISSUER: string = 'tenwell.com'
 const verifyAccessToken = (authorization: string) :  Promise<IAuthInfo> => {
@@ -17,7 +17,7 @@ const verifyAccessToken = (authorization: string) :  Promise<IAuthInfo> => {
                     reject(new Error('JWT is not verified'));
                 } else {
                     
-                    console.log('verified', JSON.stringify(decoded))
+                    logger.info('verified', JSON.stringify(decoded))
 
                     if(!decoded.id){
                         throw new Error('invalid JWT')

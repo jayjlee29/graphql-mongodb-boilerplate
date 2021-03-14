@@ -12,19 +12,9 @@ import {generateAccessToken} from './authorizer'
 import {getRandomId} from './common/utils'
 import {IUser} from './models'
 import userService from './service/UserServiceImpl'
-const logger = getLogger(__filename.slice(__dirname.length + 1));
-logger.level = "debug"
+import logger from './common/logger'
 
 const TOKEN_EXPIRES_IN = 60;	//60s //60*60*24 //24h
-
-console.log = (...args: any[]) => {
-  
-  logger.debug(args)
-}
-
-console.error = (...args: any[]) =>{
-  logger.error(args)
-}
 
 //monodb connect
 connect();
@@ -112,12 +102,12 @@ apolloServer.applyMiddleware({ app: expressServer });
 apolloServer.installSubscriptionHandlers(httpServer);
 
 httpServer.listen({port}, ()=>{
-  console.log(`start graphql server http://localhost:${port}/graphql, subscription endpoint : ${apolloServer.subscriptionsPath}`)
+	logger?.info(`start graphql server http://localhost:${port}/graphql, subscription endpoint : ${apolloServer.subscriptionsPath}`)
 
   const hostname = os.hostname();
   //const tokenInfo =  JSON.stringify({userId: hostname, accessToken: generateAccessToken(hostname, 60*60*24)})
   //console.log(tokenInfo)
-  console.log('hostname', hostname)
+  logger.info('hostname', hostname)
 })
 
 

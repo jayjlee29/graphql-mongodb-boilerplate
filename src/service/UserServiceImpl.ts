@@ -20,6 +20,7 @@ class UserServiceImpl implements UserService{
 
 	saveUser(user: IUser): Promise<IUser> {
 		const userSchema = new UserSchema(Object.assign({_id: user.id}, user));
+		
 		return userSchema.save();
 	}
 
@@ -32,14 +33,20 @@ class UserServiceImpl implements UserService{
 			const r : IUser = Object.assign({
 				id: user.id
 			}, user.toJSON())
-
-			console.log('getUser', r, user);
 			return r
 		})
 
 	}
     getUsers(ids: String[]): Promise<IUser[]> {
-		return Promise.resolve(null as any)
+		return UserSchema.find({_id: ids}).then((users)=>{
+			const results = users.map((user)=>{
+				return Object.assign({
+					id: user.id
+				}, user.toJSON())
+			})
+			return Promise.resolve(results)
+		})
+		
 	}
 }
 

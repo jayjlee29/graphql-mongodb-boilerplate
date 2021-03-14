@@ -1,4 +1,5 @@
 'use strict'
+import logger from '../common/logger'
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 dotenv.config()
@@ -14,7 +15,7 @@ export default () => {
         db.on('error', console.error);
         db.once('open', function(){
             // CONNECTED TO MONGODB SERVER
-            console.log("Connected to mongod server");
+            logger.info("Connected to mongod server");
         });
         //console.log(URI)
         //mongoose.connect(`mongodb://${URI}/${DB}`, { useNewUrlParser: true, useUnifiedTopology: true  });

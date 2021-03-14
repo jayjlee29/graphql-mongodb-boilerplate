@@ -1,6 +1,6 @@
 
 interface IUser {
-    id: string;
+    id?: string;
     username?: string
     displayName?: string
     email?: string;
@@ -24,12 +24,10 @@ interface IChannelMessage {
     id: string;
     channelId: string;
     payload: string;
-    targetIds: string[];
-    targetSent: Date[];
     userId: string;
     createdAt: Date;
-    updatedAt: Date;
-    deletedAt: Date;
+    updatedAt?: Date;
+    deletedAt?: Date;
 }
 
 interface ISentChannelMessage {

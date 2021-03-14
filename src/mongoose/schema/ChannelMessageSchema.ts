@@ -7,8 +7,6 @@ const Schema = mongoose.Schema;
 const schema = new mongoose.Schema({
     channelId: { type: Schema.Types.ObjectId, ref: 'Channel', index: true },
     payload: String,
-    targetIds: [String],
-    targetSent: [Boolean],
     userId: { type: String, ref: 'User' },
     createdAt: {type: Date, default: Date.now},
     updatedAt: Date,

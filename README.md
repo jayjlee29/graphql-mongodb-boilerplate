@@ -12,6 +12,12 @@ npm run mongodb
 npm run dev
 ```
 
+## build
+
+```
+npm run clean && npm run build
+```
+
 ## doc
  - graphql-compose : https://graphql-compose.github.io/docs/basics/understanding-types.html
  - what is resolver : https://graphql-compose.github.io/docs/basics/what-is-resolver.html
@@ -34,8 +40,14 @@ gcloud projects list
 ```
 
 export PROJECT_ID=$(gcloud config get-value project)
-npm run clean && npm run build
 docker build -t gcr.io/${PROJECT_ID}/graphql-mongodb-server:latest .
 docker push gcr.io/${PROJECT_ID}/graphql-mongodb-server:latest
 gcloud run deploy graphql-mongodb-server --image gcr.io/${PROJECT_ID}/graphql-mongodb-server:latest --platform managed --region us-central1
+```
+
+
+## Jest
+
+```
+jest ./test/service.test.ts --forceExit
 ```

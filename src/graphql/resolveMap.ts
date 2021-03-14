@@ -4,7 +4,7 @@ import {UserSchema, ChannelSchema, ChannelMessageSchema, ChannelMemberSchema, Se
 import channelService from '../service/ChannelServiceImpl'
 import {IChannel, IChannelMessage, IAuthInfo, ISubscriptionMessage, IConnection, IChannelMember, ISentChannelMessage} from '../models'
 import mongoose from 'mongoose';
-
+import logger from '../common/logger'
 
 const resolverMap: IResolvers = {
   Query: {
@@ -23,9 +23,8 @@ const resolverMap: IResolvers = {
       const startAtPromise: Promise<Date> = latestMessageId?ChannelMessageSchema.findById(latestMessageId).then((m)=>m?m.createdAt:new Date()) : Promise.resolve(new Date(0))
       return startAtPromise.then((startAt)=>{
         if(!startAt){
-          throw new Error('');
+          throw new Error('startAt is null');
         }
-        console.log('startAt', startAt)
         return ChannelMessageSchema.find({channelId: channelId, createdAt: {"$gte": startAt}}, null, {limit, skip}).sort({createdAt: -1})
       })
 
@@ -56,7 +55,7 @@ const resolverMap: IResolvers = {
     publishChannelMessage(root: any, args: {channelId: string, payload: string}, context: {pubsub: any, authInfo: IAuthInfo}, info: any) : Promise<IChannelMessage> {
       const {pubsub, authInfo} = context;
       const {channelId, payload} = args
-      console.log('authInfo', JSON.stringify(authInfo))
+      logger.info('authInfo', JSON.stringify(authInfo))
       //channelId 유효성 검사
       return ChannelSchema.findById(new mongoose.Types.ObjectId(channelId)).then((channel)=>{
         if(!channel || !channel.id){
@@ -75,9 +74,9 @@ const resolverMap: IResolvers = {
   },
   Subscription: {
     channel: {
-      resolve: (channelMessage: IChannelMessage) : Promise<ISubscriptionMessage> => {
-        // make subscription message(currnet type channelMessage)
-        console.log('subscription published', JSON.stringify(channelMessage))
+      resolve: (channelMessage: IChannelMessage, args: any, context: {pubsub: any, authInfo: IAuthInfo, connection: IConnection}, info) : Promise<ISubscriptionMessage> => {
+        const {authInfo, connection} = context;
+        logger.info('published', JSON.stringify(channelMessage), authInfo)
 
         if(!channelMessage){
           return Promise.reject(new Error('message is null'));
@@ -103,7 +102,6 @@ const resolverMap: IResolvers = {
                       
                     return schema;
                   })
-  
                   SentChannelMessageSchema.insertMany(sentHistSchema, (err, results)=>{
   
                     if(err){
@@ -133,11 +131,19 @@ const resolverMap: IResolvers = {
       subscribe: (root: any, args: any, context: {pubsub: any, authInfo: IAuthInfo, connection: IConnection}, info: Object) => {
         const { pubsub, authInfo, connection } = context;
         const { channelId } = args
-        //console.log('subscribe', channelId, connection, authInfo)
+        logger.info('join channel', channelId, connection, authInfo)
         if(!authInfo || !authInfo.id){
           throw new Error('UnAuthorized')
         }
         if(pubsub && channelId){
+          const msg : IChannelMessage = {
+            id: '',
+            channelId: channelId,
+            userId: '',
+            payload: 'welcome',
+            createdAt: new Date()
+          }
+          pubsub.publish(channelId, msg)
           return pubsub.asyncIterator(channelId)
         } else {
           throw new Error(`Error subscribe ${authInfo}`)
