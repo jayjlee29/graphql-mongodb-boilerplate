@@ -102,14 +102,9 @@ const resolverMap: IResolvers = {
                       
                     return schema;
                   })
-                  SentChannelMessageSchema.insertMany(sentHistSchema, (err, results)=>{
-  
-                    if(err){
-                      reject(err)
-                    } else {
-                      resolve(results);
-                    }
-                  })
+
+                  SentChannelMessageSchema.insertMany(sentHistSchema).then(resolve).catch(reject);
+
                 })
               }
                 

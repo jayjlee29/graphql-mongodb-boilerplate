@@ -91,13 +91,14 @@ class ChannelServiceImpl implements ChannelService{
 				return channelMember
 			})	
 
-			ChannelMemberSchema.insertMany(schemas, (err: Error, docs: IChannelMember[])=>{
-				if(err){
-					return reject(err)
-				}
+			// ChannelMemberSchema.insertMany(schemas, (err: Error, docs: IChannelMember[])=>{
+			// 	if(err){
+			// 		return reject(err)
+			// 	}
 
-				return resolve(docs)
-			})
+			// 	return resolve(docs)
+			// })
+			ChannelMemberSchema.insertMany(schemas).then(resolve).catch(reject);
 		})
 	}
 }

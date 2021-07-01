@@ -24,7 +24,7 @@ const port = process.env.PORT || 8000;
 const expressServer = express();
 
 //express use, get
-expressServer.use('*', cors());
+expressServer.use(cors());
 expressServer.use(compression());
 expressServer.get('/signin/anonymous', async (req: any, res, next)=>{
 	const displayName: string = req.query.displayName;
